@@ -1,6 +1,7 @@
 package Servlet;
 
 import com.sbs.exam.util.DBUtil;
+import com.sbs.exam.util.SecSql;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -37,7 +38,9 @@ public class ArticleListServlet extends HttpServlet {
     try {
       con = DriverManager.getConnection(url, user, password);
 
-      String sql = "SELECT * FROM article";
+      SecSql sql = new SecSql();
+      sql.append("SELECT * FROM article");
+
       List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
 
       req.setAttribute("articleRows", articleRows);

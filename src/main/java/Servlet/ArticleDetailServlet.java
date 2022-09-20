@@ -1,6 +1,7 @@
 package Servlet;
 
 import com.sbs.exam.util.DBUtil;
+import com.sbs.exam.util.SecSql;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -35,10 +36,10 @@ public class ArticleDetailServlet extends HttpServlet {
 
     try {
       con = DriverManager.getConnection(url, user, password);
-            int id = Integer.parseInt(req.getParameter("id"));
+      int id = Integer.parseInt(req.getParameter("id"));
 
-      String sql = String.format("SELECT* FROM article WHERE id = %d", id);
-
+      SecSql sql = new SecSql();
+      sql.append("SELECT* FROM article WHERE id = ?", id);
       Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
 
       req.setAttribute("articleRow", articleRow);
