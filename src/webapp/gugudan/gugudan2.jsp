@@ -1,12 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%
-int dan = Integer.parseInt(request.getParameter("dan"));
-int limit = Integer.parseInt(request.getParameter("limit"));
+int dan = (int) request.getAttribute("dan");
+int limit = (int) request.getAttribute("limit");
 %>
 
 <h1>
-구구단 : <%=dan%>단
+구구단 : <%=dan%>단 * <%=limit%>까지
 </h1>
 
 <% for ( int i = 1; i <= limit; i++ ) { %>

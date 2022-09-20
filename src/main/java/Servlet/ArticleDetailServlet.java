@@ -1,4 +1,4 @@
-package com.sbs.exam;
+package Servlet;
 
 import com.sbs.exam.util.DBUtil;
 import jakarta.servlet.ServletException;
@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/detail")
+public class ArticleDetailServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -36,12 +35,15 @@ public class ArticleListServlet extends HttpServlet {
 
     try {
       con = DriverManager.getConnection(url, user, password);
-      DBUtil dbUtil = new DBUtil(req, resp);
+            int id = Integer.parseInt(req.getParameter("id"));
 
-      String sql = "SELECT * FROM article";
-      List<Map<String, Object>> articleRows = dbUtil.selectRows(con, sql);
+      String sql = String.format("SELECT* FROM article WHERE id = %d", id);
 
-      resp.getWriter().append(articleRows.toString());
+      Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
+
+      req.setAttribute("articleRow", articleRow);
+      req.getRequestDispatcher("../article/detail.jsp").forward(req, resp);
+
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {

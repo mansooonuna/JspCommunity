@@ -1,4 +1,4 @@
-package com.sbs.exam;
+package Servlet;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,11 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/hello")
-public class HelloServlet extends HttpServlet {
+@WebServlet("/home/main")
+public class HomeServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    Rq rq = new Rq(req, resp);
-    rq.appendBody("hello, 안녕하세요.");
+    req.getRequestDispatcher("../home/main.jsp").forward(req,resp);
   }
 }
