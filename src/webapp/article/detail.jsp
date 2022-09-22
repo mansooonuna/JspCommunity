@@ -20,6 +20,6 @@ Map<String, Object> articleRow = (Map<String, Object>) request.getAttribute("art
 
 <div><a href="list">   >> 리스트로 돌아가기</a></div>
 
-<button onclick=<a href="delete?id=<%=articleRow.get("id")%>"></a> 게시물 삭제하기</button>
+
 </body>
 </html>
