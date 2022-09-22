@@ -9,14 +9,17 @@ Map<String, Object> articleRow = (Map<String, Object>) request.getAttribute("art
 <!doctype html>
 <head>
   <meta charset="UTF-8">
-  <title>게시물 상세페이지</title>
+  <title>▷ DETAIL</title>
 </head>
 <body>
-<h1>게시물 상세페이지</h1>
-<div>번호 : <%= (int) articleRow.get("id")%></div>
-<div>날짜 : <%= (String) articleRow.get("regDate")%></div>
-<div>제목 : <%= (String) articleRow.get("title")%></div>
-<div>내용 : <%= (String) articleRow.get("body")%></div>
+<h1>게시물 상세보기</h1>
+<div>번  호 : <%= (int) articleRow.get("id")%></div>
+<div>날  짜 : <%= (String) articleRow.get("regDate")%></div>
+<div>제  목 : <%= (String) articleRow.get("title")%></div>
+<div>내  용 : <%= (String) articleRow.get("body")%></div>
+
 <div><a href="list">   >> 리스트로 돌아가기</a></div>
+
+<button onclick=<a href="delete?id=<%=articleRow.get("id")%>"></a> 게시물 삭제하기</button>
 </body>
 </html>

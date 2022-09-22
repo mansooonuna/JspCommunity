@@ -9,20 +9,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/delete")
+public class ArticleDeleteServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
     String url = "jdbc:mysql://127.0.0.1:3306/Jsp_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
     String user = "root";
     String password = "";
+
+    req.setCharacterEncoding("UTF-8");
+    resp.setCharacterEncoding("UTF-8");
+    resp.setContentType("thxt/html; charset-utf-8");
 
     try {
       Class.forName("com.mysql.jdbc.Driver");
@@ -32,22 +36,19 @@ public class ArticleListServlet extends HttpServlet {
       return;
     }
 
+
     // DB 연결
     Connection con = null;
 
     try {
       con = DriverManager.getConnection(url, user, password);
+      int id = Integer.parseInt(req.getParameter("id"));
 
       SecSql sql = new SecSql();
-      sql.append("SELECT * FROM article ORDER BY id DESC");
+      sql.append("DELETE FROM article WHERE id = ?", id);
 
-      List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
-
-      req.setAttribute("articleRows", articleRows);
-      req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
-
-
-
+      DBUtil.delete(con, sql);
+      resp.getWriter().append(String.format("<script> alert('%d번 글이 삭제되었습니다.'); location.replace('list'); </script>", id));
 
 
     } catch (SQLException e) {
