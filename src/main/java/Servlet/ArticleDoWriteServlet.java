@@ -12,17 +12,17 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/doWrite")
+public class ArticleDoWriteServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
     String url = "jdbc:mysql://127.0.0.1:3306/Jsp_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
     String user = "root";
     String password = "";
+
     try {
       Class.forName("com.mysql.jdbc.Driver");
     } catch (ClassNotFoundException e) {
@@ -36,30 +36,15 @@ public class ArticleListServlet extends HttpServlet {
 
     try {
       con = DriverManager.getConnection(url, user, password);
+      String title = req.getParameter("title");
+      String body = req.getParameter("body");
 
-      int page = 1;
+      SecSql sql = new SecSql();
+      sql.append("INSERT INTO article(regDate, updateDate, title, `body`)");
+      sql.append("VALUES (NOW(), NOW(), ?, ?)", title, body);
 
-      if(req.getParameter("page") != null && req.getParameter("page").length() != 0) {
-        page = Integer.parseInt(req.getParameter("page"));
-      }
-
-      int itemInAPage = 20;
-      int limitFrom = (page - 1) * itemInAPage;
-
-      SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt FROM article");
-
-      int totalCount = DBUtil.selectRowIntValue(con, sql);
-      int totalPage = (int) Math.ceil((double)totalCount / itemInAPage);
-
-      sql = SecSql.from("SELECT * FROM article ORDER BY id DESC");
-      sql.append("LIMIT ?, ?", limitFrom, itemInAPage);
-
-      List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
-
-      req.setAttribute("articleRows", articleRows);
-      req.setAttribute("page", page);
-      req.setAttribute("totalPage", totalPage);
-      req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
+      int id = DBUtil.insert(con, sql);
+      resp.getWriter().append(String.format("<script> alert('%d번 글이 등록되었습니다.'); location.replace('list'); </script>",id));
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
