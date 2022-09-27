@@ -14,33 +14,33 @@ int totalPage = (int) request.getAttribute("totalPage");
   <title>게시물 리스트</title>
 </head>
 <body>
-  <h1>게시물 리스트</h1>
-  <table border="1">
-    <thead>
-      <tr>
-        <th>번호</th>
-        <th>날짜</th>
-        <th>제목</th>
-        <th>비고</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%
-      for ( Map<String, Object> articleRow : articleRows) {
-      %>
-      <tr>
-        <td><%=articleRow.get("id")%></td>
-        <td><%=articleRow.get("regDate")%></td>
-        <td><a href="doDetail?id=<%=articleRow.get("id")%>"><%=articleRow.get("title")%></a></td>
-        <td>
-          <a href="doDelete?id=<%=articleRow.get("id")%>">삭제하기</a>
-        </td>
-      </tr>
-      <%
-      }
-      %>
-    </tbody>
-  </table>
+<h1>게시물 리스트</h1>
+<table border="1">
+  <thead>
+  <tr>
+    <th>번호</th>
+    <th>날짜</th>
+    <th>제목</th>
+    <th>비고</th>
+  </tr>
+  </thead>
+  <tbody>
+  <%
+  for ( Map<String, Object> articleRow : articleRows) {
+  %>
+  <tr>
+    <td><%=articleRow.get("id")%></td>
+    <td><%=articleRow.get("regDate")%></td>
+    <td><a href="detail?id=<%=articleRow.get("id")%>"><%=articleRow.get("title")%></a></td>
+    <td>
+      <a href="doDelete?id=<%=articleRow.get("id")%>">삭제하기</a>
+    </td>
+  </tr>
+  <%
+  }
+  %>
+  </tbody>
+</table>
 <style type="text/css">
       .page > a.red {
         color: red;

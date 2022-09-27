@@ -39,11 +39,11 @@ public class ArticleDetailServlet extends HttpServlet {
       int id = Integer.parseInt(req.getParameter("id"));
 
       SecSql sql = new SecSql();
-      sql.append("SELECT* FROM article WHERE id = ?", id);
+      sql.append("SELECT * FROM article WHERE id = ?", id);
       Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
 
       req.setAttribute("articleRow", articleRow);
-      req.getRequestDispatcher("../article/detail.jsp").forward(req, resp);
+      req.getRequestDispatcher("../article/detail.jsp").forward(req,resp);
 
     } catch (SQLException e) {
       e.printStackTrace();

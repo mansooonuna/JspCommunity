@@ -23,7 +23,6 @@ public class ArticleListServlet extends HttpServlet {
     String url = "jdbc:mysql://127.0.0.1:3306/Jsp_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
     String user = "root";
     String password = "";
-
     try {
       Class.forName("com.mysql.jdbc.Driver");
     } catch (ClassNotFoundException e) {
@@ -39,9 +38,11 @@ public class ArticleListServlet extends HttpServlet {
       con = DriverManager.getConnection(url, user, password);
 
       int page = 1;
-      if (req.getParameter("page") != null && req.getParameter("page").length() == 0) {
+
+      if(req.getParameter("page") != null && req.getParameter("page").length() != 0) {
         page = Integer.parseInt(req.getParameter("page"));
       }
+
       int itemInAPage = 10;
       int limitFrom = (page - 1) * itemInAPage;
 
@@ -51,17 +52,18 @@ public class ArticleListServlet extends HttpServlet {
       int totalCount = DBUtil.selectRowIntValue(con, sql);
       int totalPage = (int) Math.ceil((double)totalCount / itemInAPage);
 
-      sql = SecSql.from("SELECT * FROM article ORDER BY id DESC");
+      sql = SecSql.from("SELECT *");
+      sql.append("FROM article");
+      sql.append("ORDER BY id DESC");
       sql.append("LIMIT ?, ?", limitFrom, itemInAPage);
 
+      System.out.println(sql);
       List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
 
       req.setAttribute("articleRows", articleRows);
       req.setAttribute("page", page);
       req.setAttribute("totalPage", totalPage);
       req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
-
-
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
