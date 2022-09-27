@@ -14,18 +14,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
-@WebServlet("/article/doWrite")
-public class ArticleDoWriteServlet extends HttpServlet {
+@WebServlet("/article/modify")
+public class ArticleModifyServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
     String url = "jdbc:mysql://127.0.0.1:3306/Jsp_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
     String user = "root";
     String password = "";
-
-    req.setCharacterEncoding("UTF-8");
-    resp.setCharacterEncoding("UTF-8");
-    resp.setContentType("text/html; charset-utf-8");
 
     try {
       Class.forName("com.mysql.jdbc.Driver");
@@ -38,18 +34,19 @@ public class ArticleDoWriteServlet extends HttpServlet {
     // DB 연결
     Connection con = null;
 
-
     try {
       con = DriverManager.getConnection(url, user, password);
-      String title = req.getParameter("title");
-      String body = req.getParameter("body");
 
-      SecSql sql = new SecSql();
-      sql.append("INSERT INTO article(regDate, updateDate, title, `body`)");
-      sql.append("VALUES (NOW(), NOW(), ?, ?)", title, body);
+      int id = Integer.parseInt(req.getParameter("id"));
 
-      int id = DBUtil.insert(con, sql);
-      resp.getWriter().append(String.format("<script> alert('%d번 글이 등록되었습니다.'); location.replace('list'); </script>",id));
+      SecSql sql = SecSql.from("SELECT *");
+      sql.append("FROM article");
+      sql.append("WHERE id = ?", id);
+
+      Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
+      req.setAttribute("articleRow", articleRow);
+      req.getRequestDispatcher("../article/modify.jsp").forward(req, resp);
+
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
@@ -62,6 +59,7 @@ public class ArticleDoWriteServlet extends HttpServlet {
       }
     }
   }
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     doGet(req, resp);

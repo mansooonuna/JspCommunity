@@ -12,10 +12,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Map;
 
-@WebServlet("/article/doWrite")
-public class ArticleDoWriteServlet extends HttpServlet {
+@WebServlet("/article/doModify")
+public class ArticleDoModifyServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -41,15 +40,16 @@ public class ArticleDoWriteServlet extends HttpServlet {
 
     try {
       con = DriverManager.getConnection(url, user, password);
+      int id = Integer.parseInt(req.getParameter("id"));
       String title = req.getParameter("title");
       String body = req.getParameter("body");
 
       SecSql sql = new SecSql();
-      sql.append("INSERT INTO article(regDate, updateDate, title, `body`)");
-      sql.append("VALUES (NOW(), NOW(), ?, ?)", title, body);
+      sql.append("UPDATE article SET title = ?, `body` = ? WHERE id = ?", title, body, id);
 
-      int id = DBUtil.insert(con, sql);
-      resp.getWriter().append(String.format("<script> alert('%d번 글이 등록되었습니다.'); location.replace('list'); </script>",id));
+      DBUtil.update(con, sql);
+      resp.getWriter().append(String.format("<script> alert('%d번 글이 수정되었습니다.'); location.replace('detail?id=%d'); </script>", id, id));
+
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {

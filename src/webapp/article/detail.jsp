@@ -18,7 +18,9 @@ Map<String, Object> articleRow = (Map<String, Object>) request.getAttribute("art
 <div>제  목 : <%= (String) articleRow.get("title")%></div>
 <div>내  용 : <%= (String) articleRow.get("body")%></div>
 
-<div><a href="list">   >> 리스트로 돌아가기</a></div>
+<button type = "submit"> <a href = "modify?id=<%=articleRow.get("id")%>""> 글수정 </a></button>
+<div><a href="list">   >> 목록보기 </a></div>
+
 
 
 </body>
