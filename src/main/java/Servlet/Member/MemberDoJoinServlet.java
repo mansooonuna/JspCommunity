@@ -34,8 +34,6 @@ public class MemberDoJoinServlet extends HttpServlet {
 
     // DB 연결
     Connection con = null;
-
-
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
       String loginId = req.getParameter("loginId");
@@ -43,7 +41,16 @@ public class MemberDoJoinServlet extends HttpServlet {
       String name = req.getParameter("name");
 
       SecSql sql = new SecSql();
-      sql.append("INSERT INTO `member`(regDate, updateDate, loginId, loginPw, `name`)");
+      sql.append("SELECT COUNT(*) AS cnt FROM `member` WHERE loginId = ?", loginId);
+
+      boolean isAvailableLoginId = DBUtil.selectRowIntValue(con, sql) == 0;
+
+      if(isAvailableLoginId == false) {
+        resp.getWriter().append(String.format("<script>alert('%s (은)는 이미 사용중인 아이디입니다.'); history.back();</script>", loginId));
+        return;
+      }
+
+      sql = SecSql.from("INSERT INTO `member`(regDate, updateDate, loginId, loginPw, `name`)");
       sql.append("VALUES (NOW(), NOW(), ?, ?, ?)", loginId, loginPw, name);
 
       DBUtil.insert(con, sql);

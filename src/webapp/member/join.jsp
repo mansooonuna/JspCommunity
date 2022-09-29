@@ -55,10 +55,10 @@
     </script>
 
 <form action="doJoin" method="POST" onsubmit="JoinForm__submit(this); return false;">
-  <div>아　이　디 : <input autocapitalize="off" placeholder="아이디를 입력해주세요" name = "loginId" type="text"/> </div>
-  <div>비 밀 번 호 : <input autocapitalize="off" placeholder="비밀번호를 입력해주세요." name = "loginPw" type="password"/> </div>
-  <div>비밀번호확인 : <input autocapitalize="off" placeholder="비밀번호를 확인해주세요." name = "loginPwConfirm" type="password"/> </div>
-  <div>이　　　름 : <input autocapitalize="off" placeholder="이름을 입력해주세요." name = "name" type="text"/> </div>
+  <div>아　이　디 : <input placeholder="아이디를 입력해주세요" name = "loginId" type="text"/> </div>
+  <div>비 밀 번 호 : <input placeholder="비밀번호를 입력해주세요." name = "loginPw" type="password"/> </div>
+  <div>비밀번호확인 : <input placeholder="비밀번호를 확인해주세요." name = "loginPwConfirm" type="password"/> </div>
+  <div>이　　　름 : <input placeholder="이름을 입력해주세요." name = "name" type="text"/> </div>
 
   <div>
     <button type="submit">가입</button>
