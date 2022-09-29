@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Article;
 
 import com.sbs.exam.Config;
 import com.sbs.exam.util.DBUtil;
@@ -13,11 +13,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/modify")
+public class ArticleModifyServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -37,29 +36,16 @@ public class ArticleListServlet extends HttpServlet {
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
 
-      int page = 1;
+      int id = Integer.parseInt(req.getParameter("id"));
 
-      if(req.getParameter("page") != null && req.getParameter("page").length() != 0) {
-        page = Integer.parseInt(req.getParameter("page"));
-      }
+      SecSql sql = SecSql.from("SELECT *");
+      sql.append("FROM article");
+      sql.append("WHERE id = ?", id);
 
-      int itemInAPage = 20;
-      int limitFrom = (page - 1) * itemInAPage;
+      Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
+      req.setAttribute("articleRow", articleRow);
+      req.getRequestDispatcher("../article/modify.jsp").forward(req, resp);
 
-      SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt FROM article");
-
-      int totalCount = DBUtil.selectRowIntValue(con, sql);
-      int totalPage = (int) Math.ceil((double)totalCount / itemInAPage);
-
-      sql = SecSql.from("SELECT * FROM article ORDER BY id DESC");
-      sql.append("LIMIT ?, ?", limitFrom, itemInAPage);
-
-      List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
-
-      req.setAttribute("articleRows", articleRows);
-      req.setAttribute("page", page);
-      req.setAttribute("totalPage", totalPage);
-      req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
@@ -72,6 +58,7 @@ public class ArticleListServlet extends HttpServlet {
       }
     }
   }
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     doGet(req, resp);

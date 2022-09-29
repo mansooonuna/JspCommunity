@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Member;
 
 import com.sbs.exam.Config;
 import com.sbs.exam.util.DBUtil;
@@ -14,17 +14,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-@WebServlet("/article/doModify")
-public class ArticleDoModifyServlet extends HttpServlet {
+@WebServlet("/member/doJoin")
+public class MemberDoJoinServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
 
 
     req.setCharacterEncoding("UTF-8");
     resp.setCharacterEncoding("UTF-8");
     resp.setContentType("text/html; charset-utf-8");
-
     String driverName = Config.getDriverClassName();
     try {
       Class.forName(driverName);
@@ -40,16 +38,16 @@ public class ArticleDoModifyServlet extends HttpServlet {
 
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
-      int id = Integer.parseInt(req.getParameter("id"));
-      String title = req.getParameter("title");
-      String body = req.getParameter("body");
+      String loginId = req.getParameter("loginId");
+      String loginPw = req.getParameter("loginPw");
+      String name = req.getParameter("name");
 
       SecSql sql = new SecSql();
-      sql.append("UPDATE article SET title = ?, `body` = ? WHERE id = ?", title, body, id);
+      sql.append("INSERT INTO `member`(regDate, updateDate, loginId, loginPw, `name`)");
+      sql.append("VALUES (NOW(), NOW(), ?, ?, ?)", loginId, loginPw, name);
 
-      DBUtil.update(con, sql);
-      resp.getWriter().append(String.format("<script> alert('%d번 글이 수정되었습니다.'); location.replace('detail?id=%d'); </script>", id, id));
-
+      DBUtil.insert(con, sql);
+      resp.getWriter().append("<script> alert('회원가입 완료!'); location.replace('../home/main'); </script>");
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {

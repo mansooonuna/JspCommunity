@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Member;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,11 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/article/write")
-public class ArticleWriteServlet extends HttpServlet {
+@WebServlet("/member/join")
+public class MemberJoinServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    req.getRequestDispatcher("../article/write.jsp").forward(req, resp);
+    req.getRequestDispatcher("../member/join.jsp").forward(req, resp);
   }
 
   @Override

@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Article;
 
 import com.sbs.exam.Config;
 import com.sbs.exam.util.DBUtil;
@@ -15,13 +15,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
-@WebServlet("/article/modify")
-public class ArticleModifyServlet extends HttpServlet {
+@WebServlet("/article/detail")
+public class ArticleDetailServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-
     String driverName = Config.getDriverClassName();
+
     try {
       Class.forName(driverName);
     } catch (ClassNotFoundException e) {
@@ -35,16 +34,14 @@ public class ArticleModifyServlet extends HttpServlet {
 
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
-
       int id = Integer.parseInt(req.getParameter("id"));
 
-      SecSql sql = SecSql.from("SELECT *");
-      sql.append("FROM article");
-      sql.append("WHERE id = ?", id);
-
+      SecSql sql = new SecSql();
+      sql.append("SELECT * FROM article WHERE id = ?", id);
       Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
+
       req.setAttribute("articleRow", articleRow);
-      req.getRequestDispatcher("../article/modify.jsp").forward(req, resp);
+      req.getRequestDispatcher("../article/detail.jsp").forward(req, resp);
 
     } catch (SQLException e) {
       e.printStackTrace();

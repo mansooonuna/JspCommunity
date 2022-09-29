@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Article;
 
 import com.sbs.exam.Config;
 import com.sbs.exam.util.DBUtil;
@@ -13,17 +13,15 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
-@WebServlet("/article/doWrite")
-public class ArticleDoWriteServlet extends HttpServlet {
+@WebServlet("/article/list")
+public class ArticleListServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
-    req.setCharacterEncoding("UTF-8");
-    resp.setCharacterEncoding("UTF-8");
-    resp.setContentType("text/html; charset-utf-8");
     String driverName = Config.getDriverClassName();
     try {
       Class.forName(driverName);
@@ -36,18 +34,32 @@ public class ArticleDoWriteServlet extends HttpServlet {
     // DB 연결
     Connection con = null;
 
-
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
-      String title = req.getParameter("title");
-      String body = req.getParameter("body");
 
-      SecSql sql = new SecSql();
-      sql.append("INSERT INTO article(regDate, updateDate, title, `body`)");
-      sql.append("VALUES (NOW(), NOW(), ?, ?)", title, body);
+      int page = 1;
 
-      int id = DBUtil.insert(con, sql);
-      resp.getWriter().append(String.format("<script> alert('%d번 글이 등록되었습니다.'); location.replace('list'); </script>",id));
+      if(req.getParameter("page") != null && req.getParameter("page").length() != 0) {
+        page = Integer.parseInt(req.getParameter("page"));
+      }
+
+      int itemInAPage = 20;
+      int limitFrom = (page - 1) * itemInAPage;
+
+      SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt FROM article");
+
+      int totalCount = DBUtil.selectRowIntValue(con, sql);
+      int totalPage = (int) Math.ceil((double)totalCount / itemInAPage);
+
+      sql = SecSql.from("SELECT * FROM article ORDER BY id DESC");
+      sql.append("LIMIT ?, ?", limitFrom, itemInAPage);
+
+      List<Map<String, Object>> articleRows = DBUtil.selectRows(con, sql);
+
+      req.setAttribute("articleRows", articleRows);
+      req.setAttribute("page", page);
+      req.setAttribute("totalPage", totalPage);
+      req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {

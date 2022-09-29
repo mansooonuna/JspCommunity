@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Article;
 
 import com.sbs.exam.Config;
 import com.sbs.exam.util.DBUtil;
@@ -15,12 +15,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
-@WebServlet("/article/detail")
-public class ArticleDetailServlet extends HttpServlet {
+@WebServlet("/article/doWrite")
+public class ArticleDoWriteServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    String driverName = Config.getDriverClassName();
 
+
+    req.setCharacterEncoding("UTF-8");
+    resp.setCharacterEncoding("UTF-8");
+    resp.setContentType("text/html; charset-utf-8");
+    String driverName = Config.getDriverClassName();
     try {
       Class.forName(driverName);
     } catch (ClassNotFoundException e) {
@@ -32,17 +36,18 @@ public class ArticleDetailServlet extends HttpServlet {
     // DB 연결
     Connection con = null;
 
+
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
-      int id = Integer.parseInt(req.getParameter("id"));
+      String title = req.getParameter("title");
+      String body = req.getParameter("body");
 
       SecSql sql = new SecSql();
-      sql.append("SELECT * FROM article WHERE id = ?", id);
-      Map<String, Object> articleRow = DBUtil.selectRow(con, sql);
+      sql.append("INSERT INTO article(regDate, updateDate, title, `body`)");
+      sql.append("VALUES (NOW(), NOW(), ?, ?)", title, body);
 
-      req.setAttribute("articleRow", articleRow);
-      req.getRequestDispatcher("../article/detail.jsp").forward(req, resp);
-
+      int id = DBUtil.insert(con, sql);
+      resp.getWriter().append(String.format("<script> alert('%d번 글이 등록되었습니다.'); location.replace('list'); </script>",id));
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
@@ -55,7 +60,6 @@ public class ArticleDetailServlet extends HttpServlet {
       }
     }
   }
-
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     doGet(req, resp);

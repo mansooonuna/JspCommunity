@@ -1,4 +1,4 @@
-package Servlet;
+package Servlet.Article;
 
 import com.sbs.exam.Config;
 import com.sbs.exam.util.DBUtil;
@@ -14,10 +14,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-@WebServlet("/article/doDelete")
-public class ArticleDoDeleteServlet extends HttpServlet {
+@WebServlet("/article/doModify")
+public class ArticleDoModifyServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+
 
     req.setCharacterEncoding("UTF-8");
     resp.setCharacterEncoding("UTF-8");
@@ -26,8 +28,7 @@ public class ArticleDoDeleteServlet extends HttpServlet {
     String driverName = Config.getDriverClassName();
     try {
       Class.forName(driverName);
-    } catch (
-        ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       System.out.printf("[ClassNotFoundException 예외, %s]", e.getMessage());
       resp.getWriter().append("DB 드라이버 클래스 로딩 실패");
       return;
@@ -36,19 +37,20 @@ public class ArticleDoDeleteServlet extends HttpServlet {
     // DB 연결
     Connection con = null;
 
+
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
-
       int id = Integer.parseInt(req.getParameter("id"));
+      String title = req.getParameter("title");
+      String body = req.getParameter("body");
 
       SecSql sql = new SecSql();
-      sql.append("DELETE FROM article WHERE id = ?", id);
+      sql.append("UPDATE article SET title = ?, `body` = ? WHERE id = ?", title, body, id);
 
-      DBUtil.delete(con, sql);
-      resp.getWriter().append(String.format("<script> alert('* %d번 글이 삭제되었습니다.'); location.replace('list'); </script>", id));
+      DBUtil.update(con, sql);
+      resp.getWriter().append(String.format("<script> alert('%d번 글이 수정되었습니다.'); location.replace('detail?id=%d'); </script>", id, id));
 
-    } catch (
-        SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     } finally {
       if (con != null) {

@@ -11,6 +11,8 @@
 
 <body>
     <h1>Main</h1>
+    <div><a href="../member/join">회원가입</a></div>
     <div><a href="../article/list">게시물 목록보기</a></div>
+
 </body>
 </html>
