@@ -13,4 +13,8 @@ public class Config {
     return "";
   }
 
+  public static String getDriverClassName() {
+    return "com.mysql.jdbc.Driver";
+  }
+
 }
