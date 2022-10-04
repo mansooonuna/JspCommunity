@@ -45,8 +45,8 @@ public class MemberDoJoinServlet extends HttpServlet {
 
       boolean isAvailableLoginId = DBUtil.selectRowIntValue(con, sql) == 0;
 
-      if(isAvailableLoginId == false) {
-        resp.getWriter().append(String.format("<script>alert('%s (은)는 이미 사용중인 아이디입니다.'); history.back();</script>", loginId));
+      if(!isAvailableLoginId) {
+        resp.getWriter().append("<script>alert('사용중인 아이디입니다.'); history.back();</script>");
         return;
       }
 

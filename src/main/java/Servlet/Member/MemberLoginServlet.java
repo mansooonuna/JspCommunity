@@ -8,11 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/member/join")
-public class MemberJoinServlet extends HttpServlet {
+@WebServlet("/member/login")
+public class MemberLoginServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    req.getRequestDispatcher("../member/join.jsp").forward(req, resp);
+    req.getRequestDispatcher("../member/login.jsp").forward(req, resp);
   }
 
   @Override

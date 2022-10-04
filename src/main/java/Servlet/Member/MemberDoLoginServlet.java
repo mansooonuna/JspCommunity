@@ -9,14 +9,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
-@WebServlet("/member/doJoin")
-public class MemberDoJoinServlet extends HttpServlet {
+@WebServlet("/member/doLogin")
+public class MemberDoLoginServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -37,26 +39,34 @@ public class MemberDoJoinServlet extends HttpServlet {
     Connection con = null;
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
+
       String loginId = req.getParameter("loginId");
       String loginPw = req.getParameter("loginPw");
-      String name = req.getParameter("name");
 
-      SecSql sql = new SecSql();
-      sql.append("SELECT COUNT(*) AS cnt FROM `member` WHERE loginId = ?", loginId);
+      SecSql sql = SecSql.from("SELECT * FROM member");
+      sql.append("WHERE loginId = ?", loginId);
 
-      boolean isAvailableLoginId = DBUtil.selectRowIntValue(con, sql) == 0;
+      Map<String, Object> memberRow = DBUtil.selectRow(con, sql);
 
-      if(isAvailableLoginId == false) {
-        resp.getWriter().append(String.format("<script>alert('%s (은)는 이미 사용중인 아이디입니다.'); history.back();</script>", loginId));
+      if (memberRow.isEmpty()) {
+        resp.getWriter().append(String.format("<script> alert('%s (은)는 존재하지 않는 아이디 입니다.'); location.replace('../home/main'); </script>", loginId));
+
         return;
       }
 
-      sql = SecSql.from("INSERT INTO `member`(regDate, updateDate, loginId, loginPw, `name`)");
-      sql.append("VALUES (NOW(), NOW(), ?, ?, ?)", loginId, loginPw, name);
+      if (!((String) memberRow.get("loginPw")).equals(loginPw)) {
+        resp.getWriter().append("<script> alert('비밀번호가 일치하지 않습니다.'); history.back(); </script>");
 
-      DBUtil.insert(con, sql);
-      resp.getWriter().append("<script> alert('회원가입 완료!'); location.replace('../home/main'); </script>");
-    } catch (SQLException e) {
+        return;
+      }
+
+      HttpSession session = req.getSession();
+      session.setAttribute("loginedMemberId", memberRow.get("id"));
+
+      resp.getWriter().append("<script> alert('로그인 성공!'); location.replace('../home/main'); </script>");
+
+    } catch (
+        SQLException e) {
       e.printStackTrace();
     } catch (SQLErrorException e) {
       e.getOrigin().printStackTrace();
