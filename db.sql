@@ -13,4 +13,20 @@ CREATE TABLE article(
 SELECT * FROM article;
 
 INSERT INTO article(regDate, updateDate, title, `body`)
-VALUES (NOW(), NOW(), "제목1", "내용1"), (NOW(), NOW(), "제목2", "내용2"), (NOW(), NOW(), "제목3", "내용3");
+VALUES (NOW(), NOW(), CONCAT("제목", RAND()), CONCAT("내용", RAND())
+);
+
+
+CREATE TABLE `member`(
+	id INT(100) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	loginId CHAR(20) NOT NULL,
+	loginPw CHAR(20) NOT NULL,
+	`name` CHAR(20) NOT NULL
+	);
+
+SELECT * FROM `member`;
+
+ALTER TABLE article ADD COLUMN memberId INT(10) UNSIGNED NOT NULL AFTER updateDate;
+
