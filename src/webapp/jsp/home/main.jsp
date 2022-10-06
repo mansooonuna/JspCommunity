@@ -7,7 +7,7 @@
 </head>
 <body>
 <h1>메인 페이지</h1>
-
+<div><a href="../member/join">회원가입</a></div>
 <%@ include file="../part/topBar.jspf"%>
 </body>
 </html>
