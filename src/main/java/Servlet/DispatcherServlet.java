@@ -6,6 +6,7 @@ import controller.ArticleController;
 import com.sbs.exam.exception.SQLErrorException;
 import com.sbs.exam.util.DBUtil;
 import com.sbs.exam.util.SecSql;
+import dto.Article;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -42,13 +43,15 @@ public class DispatcherServlet extends HttpServlet {
       return;
     }
 
-    // DB 연결
+    /**
+     * DB 연결
+     **/
     Connection con = null;
 
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
 
-      // 모든 요청을 들어가기 전에 무조건 해야 하는 일 시작
+      /** 요청 들어가기 전에 무조건 해야 하는 일 시작 **/
       HttpSession session = req.getSession();
 
       boolean isLogined = false;
@@ -67,14 +70,17 @@ public class DispatcherServlet extends HttpServlet {
       req.setAttribute("isLogined", isLogined);
       req.setAttribute("loginedMemberId", loginedMemberId);
       req.setAttribute("loginedMemberRow", loginedMemberRow);
-      // 모든 요청을 들어가기 전에 무조건 해야 하는 일 끝
 
-      if ( rq.getControllerName().equals("article") ) {
-        ArticleController controller = new ArticleController(req, resp, con);
+      /** 요청 들어가기 전에 무조건 해야 하는 일 끝 **/
 
-        if ( rq.getActionMethodName().equals("list")) {
-          controller.actionList();
-        }
+      switch (rq.getControllerTypeName()) {
+        case "usr":
+          ArticleController articlecontroller = new ArticleController(req,resp, con);
+          switch (rq.getControllerName()) {
+            case "article":
+            articlecontroller.performAction(rq);
+            break;
+          }
       }
 
     } catch (
