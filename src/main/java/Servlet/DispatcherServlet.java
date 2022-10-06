@@ -1,10 +1,11 @@
 package Servlet;
 
 import com.sbs.exam.Config;
+import com.sbs.exam.Rq;
+import controller.ArticleController;
 import com.sbs.exam.exception.SQLErrorException;
 import com.sbs.exam.util.DBUtil;
 import com.sbs.exam.util.SecSql;
-import controller.ArticleController;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,39 +17,38 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet("/usr/*")
 public class DispatcherServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    req.setCharacterEncoding("UTF-8");
-    resp.setCharacterEncoding("UTF-8");
-    resp.setContentType("text/html; charset-utf-8");
 
-    String requestUri = req.getRequestURI();
-    String[] requestUriBits = requestUri.split("/");
+    Rq rq = new Rq(req, resp);
 
-    if (requestUriBits.length < 4) {
-      resp.getWriter().append("올바른 요청이 아닙니다.");
-      return;
+    if(rq.getIsInvalid()) {
+      rq.appendBody("올바른 요청이 아닙니다.");
     }
 
     String driverName = Config.getDriverClassName();
 
     try {
       Class.forName(driverName);
-    } catch (ClassNotFoundException e) {
+    } catch (
+        ClassNotFoundException e) {
       System.out.printf("[ClassNotFoundException 예외, %s]", e.getMessage());
-      resp.getWriter().append("DB 드라이버 클래스 로딩 실패");
+      rq.appendBody("DB 드라이버 클래스 로딩 실패");
       return;
     }
+
     // DB 연결
     Connection con = null;
 
     try {
       con = DriverManager.getConnection(Config.getDBUrl(), Config.getDBId(), Config.getDBPw());
 
+      // 모든 요청을 들어가기 전에 무조건 해야 하는 일 시작
       HttpSession session = req.getSession();
 
       boolean isLogined = false;
@@ -67,16 +67,12 @@ public class DispatcherServlet extends HttpServlet {
       req.setAttribute("isLogined", isLogined);
       req.setAttribute("loginedMemberId", loginedMemberId);
       req.setAttribute("loginedMemberRow", loginedMemberRow);
+      // 모든 요청을 들어가기 전에 무조건 해야 하는 일 끝
 
-
-      String controllerName = requestUriBits[2];
-      String actionMethodName = requestUriBits[3];
-
-
-      if (controllerName.equals("article")) {
+      if ( rq.getControllerName().equals("article") ) {
         ArticleController controller = new ArticleController(req, resp, con);
 
-        if (actionMethodName.equals("list")) {
+        if ( rq.getActionMethodName().equals("list")) {
           controller.actionList();
         }
       }
@@ -84,7 +80,7 @@ public class DispatcherServlet extends HttpServlet {
     } catch (
         SQLException e) {
       e.printStackTrace();
-    } catch (SQLErrorException e) {
+    } catch ( SQLErrorException e ) {
       e.getOrigin().printStackTrace();
     } finally {
       if (con != null) {

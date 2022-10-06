@@ -7,12 +7,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class Rq {
-  HttpServletRequest req;
-  HttpServletResponse resp;
+  private HttpServletRequest req;
+  private HttpServletResponse resp;
+  private boolean isInvalid = false;
+  private String controllerName;
+  private String actionMethodName;
 
   public Rq(HttpServletRequest req, HttpServletResponse resp) {
-    this.req = req;
-    this.resp = resp;
 
     try {
       req.setCharacterEncoding("UTF-8");
@@ -22,6 +23,21 @@ public class Rq {
     resp.setCharacterEncoding("UTF-8");
     resp.setContentType("text/html; charset-utf-8");
 
+    this.req = req;
+    this.resp = resp;
+
+    String requestUri = req.getRequestURI();
+    String[] requestUriBits = requestUri.split("/");
+
+    int minBitsCount = 4;
+
+    if (requestUriBits.length < minBitsCount) {
+      isInvalid = true;
+      return;
+    }
+
+    this.controllerName = requestUriBits[2];
+    this.actionMethodName = requestUriBits[3];
   }
 
 
@@ -46,5 +62,17 @@ public class Rq {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public boolean getIsInvalid() {
+    return isInvalid;
+  }
+
+  public String getControllerName() {
+    return controllerName;
+  }
+
+  public String getActionMethodName() {
+    return actionMethodName;
   }
 }

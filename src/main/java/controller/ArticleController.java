@@ -28,7 +28,7 @@ public class ArticleController {
   public void actionList() throws ServletException, IOException {
     int page = 1;
     if(req.getParameter("page") != null ) {
-      page = Integer.parseInt(req.getParameter("pate"));
+      page = Integer.parseInt(req.getParameter("page"));
     }
 
     int totalPage = articleService.getPrintListTotalPage();
