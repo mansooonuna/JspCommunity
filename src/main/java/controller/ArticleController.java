@@ -2,60 +2,116 @@ package controller;
 
 import com.sbs.exam.Rq;
 import dto.Article;
-import jakarta.servlet.ServletException;
+import dto.ResultData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import service.ArticleService;
 
-import java.io.IOException;
+
 import java.sql.Connection;
 import java.util.List;
-import java.util.Map;
 
 public class ArticleController extends Controller {
 
-  private HttpServletRequest req;
-  private HttpServletResponse resp;
-  private Connection conn;
-  private ArticleService articleService;
+    private HttpServletRequest req;
+    private HttpServletResponse resp;
+    private Connection con;
+    private ArticleService articleService;
 
-  public ArticleController(HttpServletRequest req, HttpServletResponse resp, Connection conn)  {
-    this.req = req;
-    this.resp = resp;
+    public ArticleController(HttpServletRequest req, HttpServletResponse resp, Connection con) {
+        this.req = req;
+        this.resp = resp;
+        this.con = con;
 
-    articleService = new ArticleService(conn);
-  }
-
-  @Override
-  public void performAction(Rq rq) {
-    switch (rq.getActionMethodName()) {
-      case "list":
-        actionList(rq);
-        break;
-      case "write":
-        actionWrite(rq);
-        break;
-    }
-  }
-
-  private void actionWrite(Rq rq) {
-    /**
-     * member 클래스 생성 후 작성할 곳
-     **/
-  }
-
-  public void actionList(Rq rq) {
-    int page = 1;
-    if(req.getParameter("page") != null ) {
-      page = Integer.parseInt(req.getParameter("page"));
+        articleService = new ArticleService(con);
     }
 
-    int totalPage = articleService.getPrintListTotalPage();
-    List<Article> articles = articleService.getPrintArticleRow(page);
+    @Override
+    public void performAction(Rq rq) {
+        switch (rq.getActionMethodName()) {
+            case "list":
+                actionList(rq);
+                break;
+            case "detail":
+                actionDetail(rq);
+                break;
+            case "write":
+                actionShowWrite(rq);
+                break;
+            case "doWrite":
+                actionDoWrite(rq);
+                break;
+            default:
+                rq.println("존재하지 않는 페이지 입니다.");
+                break;
+        }
+    }
 
-    req.setAttribute("articles", articles);
-    req.setAttribute("page", page);
-    req.setAttribute("totalPage", totalPage);
-    rq.jsp("article/list");
-  }
+    private void actionDetail(Rq rq) {
+        int id = rq.getIntParam("id",0);
+
+        if(id == 0) {
+            rq.historyBack("id를 입력해주세요.");
+            return;
+        }
+
+        Article article = articleService.getForPrintArticleById(id) ;
+        rq.setAttr("article", article);
+        rq.jsp("article/detail");
+    }
+
+    private void actionDoWrite(Rq rq) {
+        HttpSession session = req.getSession();
+
+        if (session.getAttribute("loginedMemberId") == null) {
+            rq.print(String.format("<script> alert('로그인 후 이용해주세요.'); location.replace('/jsp/member/login'); </script>"));
+            return;
+        }
+
+        String title = req.getParameter("title");
+        String body = req.getParameter("body");
+
+        String redirectUri = rq.getParam("redirectUri", "../article/list");
+
+        if (title.length() == 0) {
+            rq.historyBack("title을 입력해주세요.");
+            return;
+        }
+
+        if (body.length() == 0) {
+            rq.historyBack("body를 입력해주세요.");
+            return;
+        }
+
+        int loginedMemberId = (int) session.getAttribute("loginedMemberId");
+
+        ResultData writeRd = articleService.write(title, body, loginedMemberId);
+
+        int id = (int) writeRd.getBody().get("id");
+        redirectUri = redirectUri.replace("[NEW_ID]", id + "");
+
+        rq.replace(writeRd.getMsg(), redirectUri);
+    }
+
+    private void actionShowWrite(Rq rq) {
+        rq.jsp("article/write");
+    }
+
+    public void actionList(Rq rq) {
+        int page = 1;
+
+        if (req.getParameter("page") != null && req.getParameter("page").length() != 0) {
+            page = Integer.parseInt(req.getParameter("page"));
+        }
+
+        int totalPage = articleService.getForPrintListTotalPage();
+        List<Article> articles = articleService.getForPrintArticles(page);
+
+        rq.setAttr("articles", articles);
+        rq.setAttr("page", page);
+        rq.setAttr("totalPage", totalPage);
+
+        rq.jsp("article/list");
+    }
 }

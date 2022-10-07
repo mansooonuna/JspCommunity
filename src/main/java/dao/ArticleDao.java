@@ -39,4 +39,20 @@ public class ArticleDao {
 
     return articles;
   }
+
+  public int write(String title, String body, int loginedMemberId) {
+    SecSql sql = SecSql.from("INSERT INTO article(regDate, updateDate, title, `body`, memberId");
+    sql.append("VALUES (NOW(), NOW(), ?, ?, ?)",title,body, loginedMemberId );
+
+    int id = DBUtil.insert(con, sql);
+
+    return id;
+  }
+
+  public Article getForPrintArticleById(int id) {
+    SecSql sql = SecSql.from("SELECT * FROM article");
+    sql.append("WHERE id = ?", id);
+
+    return new Article(DBUtil.selectRow(con, sql));
+  }
 }

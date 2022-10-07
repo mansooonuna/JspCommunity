@@ -1,38 +1,47 @@
 package service;
 
-import com.sbs.exam.util.DBUtil;
-import com.sbs.exam.util.SecSql;
+import com.sbs.exam.util.Util;
 import dao.ArticleDao;
 import dto.Article;
+import dto.ResultData;
 
 import java.sql.Connection;
 import java.util.List;
-import java.util.Map;
 
 public class ArticleService {
   private ArticleDao articleDao;
-
-  public ArticleService(Connection conn) {
-    this.articleDao = new ArticleDao(conn);
+  public ArticleService(Connection con) {
+    this.articleDao = new ArticleDao(con);
   }
 
-  public int getItemInAPage() {
+  public int getItemsInAPage() {
     return 20;
   }
 
-  public int getPrintListTotalPage() {
-    int itemInAPage = getItemInAPage();
+  public int getForPrintListTotalPage() {
+    int itemInAPage = getItemsInAPage();
 
     int totalCount = articleDao.getTotalCount();
-    int totalPage = (int) Math.ceil((double) totalCount / itemInAPage);
+    int totalPage = (int) Math.ceil((double)totalCount / itemInAPage);
     return totalPage;
   }
 
-  public List<Article> getPrintArticleRow(int page) {
-    int itemInAPage = getItemInAPage();
+  public List<Article> getForPrintArticles(int page) {
+    int itemInAPage = getItemsInAPage();
     int limitFrom = (page - 1) * itemInAPage;
 
     List<Article> articles = articleDao.getArticles(itemInAPage, limitFrom);
+
     return articles;
+  }
+
+  public ResultData write(String title, String body, int loginedMemberId) {
+    int id = articleDao.write(title, body, loginedMemberId);
+
+    return ResultData.from("S-1", Util.f("%d번 게시물이 생성되었습니다.", id), "id", id);
+  }
+
+  public Article getForPrintArticleById(int id) {
+    return articleDao.getForPrintArticleById(id);
   }
 }

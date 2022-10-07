@@ -6,7 +6,6 @@ import controller.ArticleController;
 import com.sbs.exam.exception.SQLErrorException;
 import com.sbs.exam.util.DBUtil;
 import com.sbs.exam.util.SecSql;
-import dto.Article;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 @WebServlet("/usr/*")
@@ -29,7 +27,7 @@ public class DispatcherServlet extends HttpServlet {
     Rq rq = new Rq(req, resp);
 
     if(rq.getIsInvalid()) {
-      rq.appendBody("올바른 요청이 아닙니다.");
+      rq.print("올바른 요청이 아닙니다.");
     }
 
     String driverName = Config.getDriverClassName();
@@ -39,7 +37,7 @@ public class DispatcherServlet extends HttpServlet {
     } catch (
         ClassNotFoundException e) {
       System.out.printf("[ClassNotFoundException 예외, %s]", e.getMessage());
-      rq.appendBody("DB 드라이버 클래스 로딩 실패");
+      rq.print("DB 드라이버 클래스 로딩 실패");
       return;
     }
 
