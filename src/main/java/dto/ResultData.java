@@ -2,13 +2,16 @@ package dto;
 
 
 import com.sbs.exam.util.Util;
+import lombok.Getter;
 
 import java.util.Map;
 
 public class ResultData {
-
+    @Getter
     private String msg;
+    @Getter
     private String resultCode;
+    @Getter
     private Map<String, Object> body;
 
     private ResultData() {
@@ -23,18 +26,6 @@ public class ResultData {
         rd.body = Util.mapOf(bodyArgs);
 
         return rd;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public String getResultCode() {
-        return resultCode;
-    }
-
-    public Map<String, Object> getBody() {
-        return body;
     }
 
     public boolean isSuccess() {

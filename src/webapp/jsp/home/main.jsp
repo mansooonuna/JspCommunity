@@ -1,13 +1,9 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<!doctype html>
-<head>
-  <meta charset="UTF-8">
-  <title>메인</title>
-</head>
-<body>
+<c:set var="pageTitle" value="메인페이지"></c:set>
+<%@ include file="../part/head.jspf"%>
 <h1>메인 페이지</h1>
-<div><a href="../member/join">회원가입</a></div>
+
 <%@ include file="../part/topBar.jspf"%>
-</body>
-</html>
+<%@ include file="../part/foot.jspf"%>
