@@ -7,8 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="JspCommunity" />
+        <module name="practiceJsp" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="JspCommunity" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
